@@ -1,0 +1,27 @@
+# --- Núcleo de Análisis de Datos y Matemáticas ---
+numpy
+pandas
+scipy
+
+# --- Indicadores Técnicos Cuantitativos ---
+ta>=0.11.0
+
+# --- Conectores y Fuentes de Datos de Mercado ---
+MetaTrader5>=5.0
+ccxt>=4.2.0
+yfinance>=0.2.36
+websockets>=12.0
+requests>=2.31.0
+
+# --- Almacenamiento y Base de Datos Analítica ---
+duckdb>=0.10.0
+SQLAlchemy>=2.0.0
+
+# --- Panel de Control Visual y Gráficos ---
+matplotlib>=3.8.0
+plotly>=5.18.0
+
+# --- Configuración, Notificaciones y Utilidades ---
+python-dotenv>=1.0.0
+pydantic>=2.6.0
+rich>=13.7.0

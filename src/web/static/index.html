@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171d2a">
+  <title>Nexus · Terminal de trading</title>
+  <link rel="stylesheet" href="/assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="/assets/vendor/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/assets/panel.css">
+  <script defer src="/assets/vendor/bootstrap.bundle.min.js"></script>
+  <script defer src="/assets/panel.js"></script>
+</head>
+<body>
+  <a class="visually-hidden-focusable skip-link" href="#workspace">Ir al contenido</a>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar offcanvas-lg offcanvas-start" tabindex="-1" aria-labelledby="sidebar-title">
+      <div class="sidebar-inner">
+        <div class="brand">
+          <span class="brand-mark"><i class="bi bi-activity" aria-hidden="true"></i></span>
+          <span id="sidebar-title">Nexus</span>
+          <button type="button" class="btn-close btn-close-white ms-auto d-lg-none" data-bs-dismiss="offcanvas"
+                  data-bs-target="#sidebar" aria-label="Cerrar menú"></button>
+        </div>
+        <div class="nav-label">Espacio de trabajo</div>
+        <nav class="nav flex-column side-nav" aria-label="Secciones">
+          <a class="nav-link active" href="#resumen" aria-current="page"><i class="bi bi-grid-1x2" aria-hidden="true"></i> Resumen</a>
+          <a class="nav-link" href="#mercados"><i class="bi bi-bar-chart-line" aria-hidden="true"></i> Mercados</a>
+          <a class="nav-link" href="#riesgo"><i class="bi bi-shield-check" aria-hidden="true"></i> Riesgo y lotaje</a>
+          <a class="nav-link" href="#posiciones"><i class="bi bi-briefcase" aria-hidden="true"></i> Posiciones</a>
+          <a class="nav-link" href="#agentes"><i class="bi bi-diagram-3" aria-hidden="true"></i> Agentes</a>
+          <a class="nav-link" href="#configuracion"><i class="bi bi-sliders" aria-hidden="true"></i> Configuración</a>
+        </nav>
+        <div class="sidebar-foot">
+          <span class="terminal-icon"><i class="bi bi-pc-display" aria-hidden="true"></i></span>
+          <div><strong>MetaTrader 5</strong><small id="sidebar-server">Terminal local</small></div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="topbar">
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn icon-button d-lg-none" type="button" aria-label="Abrir menú" aria-controls="sidebar"
+                  data-bs-toggle="offcanvas" data-bs-target="#sidebar"><i class="bi bi-list" aria-hidden="true"></i></button>
+          <span class="topbar-label">Terminal de trading</span>
+          <span class="mobile-brand d-lg-none">Nexus</span>
+        </div>
+        <div class="topbar-actions">
+          <span id="connection-state" class="connection-state"><span class="status-dot"></span><span id="connection-label">Sin conexión</span></span>
+          <button class="btn icon-button" id="theme-toggle" type="button" aria-label="Activar tema oscuro" title="Cambiar tema">
+            <i class="bi bi-moon-stars" aria-hidden="true"></i>
+          </button>
+          <button class="btn btn-terminal" type="button" data-bs-toggle="modal" data-bs-target="#terminal-modal">
+            <i class="bi bi-plug" aria-hidden="true"></i><span id="terminal-button-label">Conectar MT5</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace container-fluid" id="workspace" tabindex="-1">
+        <div class="page-heading">
+          <div>
+            <p class="page-context" id="page-date"></p>
+            <h1 id="page-title">Vista general</h1>
+            <p id="page-description">Cuenta, cotizaciones y posiciones en MetaTrader 5.</p>
+          </div>
+          <div class="page-actions">
+            <button type="button" id="refresh" class="btn btn-outline-secondary refresh-button">
+              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Actualizar
+            </button>
+          </div>
+        </div>
+        <div id="panel-notice" class="alert py-2 px-3" role="status" hidden></div>
+
+        <section class="metrics row row-cols-2 row-cols-md-4 g-3" aria-label="Métricas de cuenta" data-pages="resumen riesgo posiciones">
+          <div class="col"><div class="metric">
+            <div class="metric-label"><i class="bi bi-wallet2" aria-hidden="true"></i> Balance</div>
+            <div class="metric-value" id="balance">—</div><div class="metric-note">Saldo de la cuenta</div>
+          </div></div>
+          <div class="col"><div class="metric">
+            <div class="metric-label"><i class="bi bi-pie-chart" aria-hidden="true"></i> Patrimonio</div>
+            <div class="metric-value" id="equity">—</div><div class="metric-note">Cuenta con resultado flotante</div>
+          </div></div>
+          <div class="col"><div class="metric">
+            <div class="metric-label"><i class="bi bi-graph-up" aria-hidden="true"></i> Resultado flotante</div>
+            <div class="metric-value" id="floating-profit">—</div><div class="metric-note" id="position-count">Posiciones abiertas</div>
+          </div></div>
+          <div class="col"><div class="metric">
+            <div class="metric-label"><i class="bi bi-layers" aria-hidden="true"></i> Margen libre</div>
+            <div class="metric-value" id="free-margin">—</div><div class="metric-note">Margen disponible</div>
+          </div></div>
+        </section>
+
+        <section class="row g-3 market-layout" aria-label="Mercados y gráficos" data-pages="resumen mercados">
+          <div class="col-12 col-md-8">
+            <article class="surface card chart-card">
+              <div class="surface-head chart-head">
+                <div class="instrument-heading">
+                  <span class="instrument-icon"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></span>
+                  <div><h2 id="instrument-title">Gráfico de velas</h2><p id="instrument-caption">MetaTrader 5 · UTC</p></div>
+                </div>
+                <div class="period-choices" role="group" aria-label="Periodo del gráfico">
+                  <button class="btn period" type="button" data-period="M1" aria-pressed="false">M1</button>
+                  <button class="btn period" type="button" data-period="M5" aria-pressed="false">M5</button>
+                  <button class="btn period" type="button" data-period="M15" aria-pressed="true">M15</button>
+                  <button class="btn period" type="button" data-period="M30" aria-pressed="false">M30</button>
+                  <button class="btn period" type="button" data-period="H1" aria-pressed="false">H1</button>
+                  <button class="btn period" type="button" data-period="H4" aria-pressed="false">H4</button>
+                  <button class="btn period" type="button" data-period="D1" aria-pressed="false">D1</button>
+                </div>
+              </div>
+              <div class="chart-area">
+                <div id="candle-chart" class="candle-chart" role="img" aria-label="Gráfico de velas de MT5" hidden></div>
+                <div id="chart-empty" class="chart-empty">
+                  <div class="chart-placeholder">
+                    <span class="placeholder-icon"><i class="bi bi-bar-chart" aria-hidden="true"></i></span>
+                    <strong id="chart-empty-title">Conecta MetaTrader 5</strong>
+                    <p id="chart-empty-caption">Selecciona tu terminal para ver el gráfico y las cotizaciones.</p>
+                    <button class="btn btn-outline-secondary btn-sm" id="chart-connect" type="button"
+                            data-bs-toggle="modal" data-bs-target="#terminal-modal">Elegir terminal</button>
+                  </div>
+                </div>
+              </div>
+              <div class="chart-footer"><span><i class="bi bi-clock" aria-hidden="true"></i> Velas disponibles · UTC</span>
+                <button type="button" id="reset-chart" class="btn btn-link" hidden>Restablecer zoom</button>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <article class="surface card watch-card">
+              <div class="surface-head">
+                <div><h2>En seguimiento</h2><p>Cotizaciones de tu bróker</p></div>
+                <button class="btn icon-button add-symbol" id="edit-watch" type="button" aria-label="Editar mercados"
+                        title="Editar mercados" data-bs-toggle="modal" data-bs-target="#watch-modal"><i class="bi bi-plus-lg" aria-hidden="true"></i></button>
+              </div>
+              <div class="watch-header"><span>Símbolo</span><span>Precio bid</span></div>
+              <div id="watch-list" class="watch-list">
+                <div class="small-empty"><i class="bi bi-binoculars" aria-hidden="true"></i><p>Conecta MT5 para agregar instrumentos.</p></div>
+              </div>
+              <div class="watch-footer" id="watch-detail">Cuando elijas un símbolo verás el ask y el spread.</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="surface card positions-card" data-pages="resumen posiciones" aria-labelledby="positions-title">
+          <div class="surface-head"><div><h2 id="positions-title">Posiciones abiertas</h2><p>Exposición de la cuenta conectada</p></div>
+            <span id="positions-total" class="count-badge" hidden></span></div>
+          <div id="positions-empty" class="small-empty"><i class="bi bi-briefcase" aria-hidden="true"></i><p>Conecta MT5 para consultar tus posiciones.</p></div>
+          <div class="table-responsive" id="positions-table" tabindex="0" role="region" aria-label="Tabla de posiciones abiertas" hidden>
+            <table class="table panel-table mb-0">
+              <thead><tr><th scope="col">Símbolo</th><th scope="col">Dirección</th><th scope="col">Lotes</th>
+                <th scope="col">Entrada</th><th scope="col">Precio actual</th><th scope="col">SL</th>
+                <th scope="col">TP</th><th scope="col">Resultado</th></tr></thead>
+              <tbody id="position-rows"></tbody>
+            </table>
+          </div>
+          <p id="positions-warning" class="inline-note" hidden><i class="bi bi-exclamation-triangle" aria-hidden="true"></i> Hay posiciones sin stop loss informado por MT5.</p>
+        </section>
+
+        <section class="row g-3" data-pages="riesgo" hidden>
+          <div class="col-12 col-md-5">
+            <article class="surface card risk-target">
+              <i class="bi bi-shield-check" aria-hidden="true"></i>
+              <h2>Objetivo de riesgo / beneficio</h2>
+              <div class="ratio-number">1 <span>:</span> 2</div>
+              <p>Objetivo de diseño para el gestor de operaciones.</p>
+            </article>
+          </div>
+          <div class="col-12 col-md-7">
+            <article class="surface card h-100">
+              <div class="surface-head"><div><h2>Reglas de gestión</h2><p>Pendientes de validar en el gestor</p></div></div>
+              <dl class="detail-list">
+                <div><dt>Lotaje</dt><dd>Según el riesgo elegido, la distancia al SL y el paso de volumen del bróker.</dd></div>
+                <div><dt>Stop loss y take profit</dt><dd>Definir cuándo ajustar la protección y extender el objetivo.</dd></div>
+                <div><dt>Límites de cuenta</dt><dd>Validar la pérdida diaria y la exposición acumulada.</dd></div>
+              </dl>
+            </article>
+          </div>
+        </section>
+
+        <section class="surface card" data-pages="agentes" hidden>
+          <div class="surface-head"><div><h2>Último análisis guardado</h2><p id="agent-time">Buscando captura…</p></div><span id="agent-mode" class="count-badge" hidden></span></div>
+          <p id="agent-warning" class="inline-note" hidden></p>
+          <div class="table-responsive" id="agent-table" tabindex="0" role="region" aria-label="Análisis de los agentes" hidden>
+            <table class="table panel-table mb-0">
+              <thead><tr><th scope="col">Mercado</th><th scope="col">Señal</th><th scope="col">Puntuación</th>
+                <th scope="col">Tendencia H1</th><th scope="col">RSI</th></tr></thead><tbody id="agent-rows"></tbody>
+            </table>
+          </div>
+          <div class="small-empty" id="agent-empty"><i class="bi bi-inboxes" aria-hidden="true"></i><p>No hay análisis guardado disponible.</p></div>
+        </section>
+
+        <section class="surface card" data-pages="configuracion" hidden>
+          <div class="surface-head"><div><h2>Conexión y pantalla</h2><p>Preferencias del terminal local</p></div></div>
+          <dl class="detail-list settings-list">
+            <div><dt>Servidor</dt><dd id="settings-server">—</dd></div>
+            <div><dt>Tipo de cuenta</dt><dd id="settings-account">—</dd></div>
+            <div><dt>Apalancamiento</dt><dd id="settings-leverage">—</dd></div>
+            <div><dt>Actualización</dt><dd>Cada 5 segundos con el panel abierto</dd></div>
+            <div><dt>Acceso</dt><dd>Supervisión de solo lectura</dd></div>
+          </dl>
+          <div class="settings-actions"><button class="btn btn-terminal" type="button" data-bs-toggle="modal"
+            data-bs-target="#terminal-modal"><i class="bi bi-plug" aria-hidden="true"></i> Gestionar conexión</button></div>
+        </section>
+
+        <footer class="workspace-footer"><span>Supervisión de solo lectura</span><span id="last-update">Consulta automática · 5 s</span></footer>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal fade" id="terminal-modal" tabindex="-1" aria-labelledby="terminal-title">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+      <div class="modal-content">
+        <div class="modal-header"><h2 class="modal-title fs-5" id="terminal-title">Conexión a MetaTrader 5</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div>
+        <form id="terminal-form">
+          <div class="modal-body">
+            <label for="terminal-mode" class="form-label">Terminal</label>
+            <select class="form-select" name="mode" id="terminal-mode">
+              <option value="DEMO">DEMO</option><option value="REAL">REAL</option>
+            </select>
+            <p class="form-text mb-0 mt-2">La conexión se comparte entre las pestañas del panel.</p>
+            <p id="terminal-message" class="form-text mt-3 mb-0" role="status" hidden></p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline-secondary" type="button" id="disconnect">Desconectar</button>
+            <button type="submit" class="btn btn-terminal" id="connect">Conectar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="watch-modal" tabindex="-1" aria-labelledby="watch-title">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+      <div class="modal-content">
+        <div class="modal-header"><h2 class="modal-title fs-5" id="watch-title">Editar mercados</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div>
+        <div class="modal-body">
+          <label for="symbol-search" class="form-label">Buscar símbolo</label>
+          <input type="search" id="symbol-search" class="form-control" placeholder="Ej. XAUUSD">
+          <p id="watch-count" class="form-text" role="status"></p>
+          <div id="symbol-options" class="symbol-options"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-terminal" id="save-watch" disabled>Guardar selección</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

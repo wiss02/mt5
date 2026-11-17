@@ -1,0 +1,32 @@
+# Entorno Virtual
+.venv/
+venv/
+env/
+
+# Variables de entorno y credenciales (¡NUNCA subir a repositorios!)
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets.json
+
+# Python cache y compilados
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Bases de datos y almacenamiento local
+*.sqlite3
+*.db
+*.duckdb
+data/cache/
+data/live_state.json
+data/agent_debate.json
+logs/
+
+# IDEs
+.vscode/
+.idea/
+
